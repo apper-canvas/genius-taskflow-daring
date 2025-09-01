@@ -25,30 +25,40 @@ const TaskList = ({
     )
   }
 
-  const sortedTasks = [...tasks].sort((a, b) => {
+const sortedTasks = [...tasks].sort((a, b) => {
     // Incomplete tasks first
-    if (a.completed !== b.completed) {
-      return a.completed ? 1 : -1
+    const aCompleted = a.completed_c || a.completed || false
+    const bCompleted = b.completed_c || b.completed || false
+    if (aCompleted !== bCompleted) {
+      return aCompleted ? 1 : -1
     }
     
     // Then by priority (High, Medium, Low)
     const priorityOrder = { High: 3, Medium: 2, Low: 1 }
-    const aPriority = priorityOrder[a.priority] || 1
-    const bPriority = priorityOrder[b.priority] || 1
+    const aPriority = priorityOrder[a.priority_c || a.priority] || 1
+    const bPriority = priorityOrder[b.priority_c || b.priority] || 1
     
     if (aPriority !== bPriority) {
       return bPriority - aPriority
     }
     
     // Then by due date (earliest first)
-    if (a.dueDate && b.dueDate) {
-      return new Date(a.dueDate) - new Date(b.dueDate)
+    const aDueDate = a.due_date_c || a.dueDate
+    const bDueDate = b.due_date_c || b.dueDate
+    if (aDueDate && bDueDate) {
+      return new Date(aDueDate) - new Date(bDueDate)
     }
-    if (a.dueDate) return -1
-    if (b.dueDate) return 1
+    if (aDueDate) return -1
+    if (bDueDate) return 1
     
     // Finally by creation date (newest first)
-    return new Date(b.createdAt) - new Date(a.createdAt)
+    const aCreated = a.created_at_c || a.createdAt || a.CreatedOn
+    const bCreated = b.created_at_c || b.createdAt || b.CreatedOn
+    if (aCreated && bCreated) {
+      return new Date(bCreated) - new Date(aCreated)
+    }
+    
+    return 0
   })
 
   return (

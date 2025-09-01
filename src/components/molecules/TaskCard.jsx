@@ -45,20 +45,25 @@ const TaskCard = forwardRef(({
   }
 
   const isDueSoon = () => {
-    const now = new Date()
-    const due = new Date(task.dueDate)
+const now = new Date()
+    const dueDate = task.due_date_c || task.dueDate
+    const due = new Date(dueDate)
     const hoursDiff = (due - now) / (1000 * 60 * 60)
     return hoursDiff > 0 && hoursDiff <= 24
   }
 
-  const isOverdue = () => {
+const isOverdue = () => {
+    const dueDate = task.due_date_c || task.dueDate
+    if (!dueDate) return false
     const now = new Date()
-    const due = new Date(task.dueDate)
-    return isAfter(now, due) && !task.completed
+    const due = new Date(dueDate)
+    const completed = task.completed_c || task.completed || false
+    return isAfter(now, due) && !completed
   }
 
-  const getPriorityColor = (priority) => {
-    switch (priority.toLowerCase()) {
+const getPriorityColor = (priority) => {
+    const taskPriority = priority || task.priority_c || task.priority || "medium"
+    switch (taskPriority.toLowerCase()) {
       case "high": return "danger"
       case "medium": return "warning"
       case "low": return "success"
@@ -66,8 +71,9 @@ const TaskCard = forwardRef(({
     }
 }
 
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
+const getStatusColor = (status) => {
+    const taskStatus = status || task.status_c || task.status || "pending"
+    switch (taskStatus.toLowerCase()) {
       case "completed": return "success"
       case "in-progress": return "warning"
       case "pending": return "default"
@@ -76,8 +82,9 @@ const TaskCard = forwardRef(({
     }
   }
 
-  const getStatusLabel = (status) => {
-    switch (status.toLowerCase()) {
+const getStatusLabel = (status) => {
+    const taskStatus = status || task.status_c || task.status || "pending"
+    switch (taskStatus.toLowerCase()) {
       case "completed": return "Completed"
       case "in-progress": return "In Progress"
       case "pending": return "Pending"
@@ -86,8 +93,9 @@ const TaskCard = forwardRef(({
     }
   }
 
-  const getCategoryVariant = (category) => {
-    switch (category.toLowerCase()) {
+const getCategoryVariant = (category) => {
+    const taskCategory = category || task.category_c || task.category || "work"
+    switch (taskCategory.toLowerCase()) {
       case "work": return "work"
       case "personal": return "personal"
       case "urgent": return "urgent"
@@ -103,8 +111,8 @@ const TaskCard = forwardRef(({
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
       whileHover={{ scale: 1.01 }}
       className={cn(
-        "bg-white rounded-xl p-5 task-shadow hover:task-shadow-hover transition-all duration-200 group",
-        task.completed && "opacity-75",
+"bg-white rounded-xl p-5 task-shadow hover:task-shadow-hover transition-all duration-200 group",
+        (task.completed_c || task.completed) && "opacity-75",
         isOverdue() && "ring-2 ring-red-200",
         className
       )}
@@ -112,7 +120,7 @@ const TaskCard = forwardRef(({
       <div className="flex items-start space-x-4">
         <div className="pt-0.5">
           <Checkbox
-            checked={task.completed}
+checked={task.completed_c || task.completed || false}
             onChange={handleToggleComplete}
           />
         </div>
@@ -121,13 +129,13 @@ const TaskCard = forwardRef(({
           <div className="flex items-start justify-between mb-3">
             <h3 className={cn(
               "text-base font-semibold text-gray-900 group-hover:text-primary-600 transition-colors duration-200",
-              task.completed && "line-through text-gray-500"
+(task.completed_c || task.completed) && "line-through text-gray-500"
             )}>
-              {task.title}
+              {task.title_c || task.title || task.Name}
             </h3>
 <div className="flex items-center space-x-2 ml-4">
-              <Badge variant={getStatusColor(task.status || (task.completed ? "completed" : "pending"))}>
-                {getStatusLabel(task.status || (task.completed ? "completed" : "pending"))}
+<Badge variant={getStatusColor((task.completed_c || task.completed) ? "completed" : (task.status_c || task.status))}>
+                {getStatusLabel((task.completed_c || task.completed) ? "completed" : (task.status_c || task.status))}
               </Badge>
               <Badge variant={getPriorityColor(task.priority)}>
                 {task.priority}
@@ -135,37 +143,37 @@ const TaskCard = forwardRef(({
             </div>
           </div>
           
-          {task.description && (
+{(task.description_c || task.description) && (
             <p className={cn(
               "text-sm text-gray-600 mb-3 leading-relaxed",
-              task.completed && "line-through text-gray-400"
+              (task.completed_c || task.completed) && "line-through text-gray-400"
             )}>
-              {task.description}
+              {task.description_c || task.description}
             </p>
           )}
           
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Badge variant={getCategoryVariant(task.category)}>
-                {task.category}
+<Badge variant={getCategoryVariant()}>
+                {task.category_c || task.category}
               </Badge>
               
-              {task.dueDate && (
+{(task.due_date_c || task.dueDate) && (
                 <div className={cn(
                   "flex items-center space-x-1 text-sm",
-                  isOverdue() && !task.completed ? "text-red-500" : 
-isDueSoon() && !task.completed ? "text-amber-600" : 
+                  isOverdue() && !(task.completed_c || task.completed) ? "text-red-500" : 
+                  isDueSoon() && !(task.completed_c || task.completed) ? "text-amber-600" : 
                   "text-gray-500"
                 )}>
                   <ApperIcon 
                     name="Calendar" 
                     size={14}
                     className={cn(
-                      isOverdue() && !task.completed && "animate-pulse-gentle"
+                      isOverdue() && !(task.completed_c || task.completed) && "animate-pulse-gentle"
                     )}
                   />
-                  <span>{formatDueDate(task.dueDate)}</span>
-                  {isOverdue() && !task.completed && (
+                  <span>{formatDueDate(task.due_date_c || task.dueDate)}</span>
+                  {isOverdue() && !(task.completed_c || task.completed) && (
                     <Badge variant="danger" className="ml-1">
                       Overdue
                     </Badge>

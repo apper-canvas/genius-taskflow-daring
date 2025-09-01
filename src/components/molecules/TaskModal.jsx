@@ -14,25 +14,26 @@ const TaskModal = ({
   task = null,
   categories = []
 }) => {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    category: "Work",
-priority: "Medium",
-    status: "pending",
-    dueDate: ""
+const [formData, setFormData] = useState({
+    title_c: "",
+    description_c: "",
+    category_c: "Work",
+    priority_c: "Medium",
+    status_c: "pending",
+    due_date_c: ""
   })
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    if (task) {
+if (task) {
+      const dueDate = task.due_date_c || task.dueDate
       setFormData({
-        title: task.title || "",
-        description: task.description || "",
-        category: task.category || "Work",
-        priority: task.priority || "Medium",
-status: task.status || "pending",
-        dueDate: task.dueDate ? new Date(task.dueDate).toISOString().slice(0, 16) : ""
+        title_c: task.title_c || task.title || task.Name || "",
+        description_c: task.description_c || task.description || "",
+        category_c: task.category_c || task.category || "Work",
+        priority_c: task.priority_c || task.priority || "Medium",
+        status_c: task.status_c || task.status || "pending",
+        due_date_c: dueDate ? new Date(dueDate).toISOString().slice(0, 16) : ""
       })
     } else {
       setFormData({
@@ -56,9 +57,9 @@ priority: "Medium",
 
     setIsLoading(true)
     try {
-      const taskData = {
+const taskData = {
         ...formData,
-        dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null
+        due_date_c: formData.due_date_c ? new Date(formData.due_date_c).toISOString() : null
       }
       
       await onSave(taskData)
@@ -112,7 +113,7 @@ priority: "Medium",
             </label>
             <Input
               type="text"
-              value={formData.title}
+value={formData.title_c}
               onChange={(e) => handleChange("title", e.target.value)}
               placeholder="Enter task title"
               required
@@ -123,7 +124,9 @@ priority: "Medium",
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Description
             </label>
-            <Textarea
+<Textarea
+              value={formData.description_c}
+              onChange={(e) => handleChange("description_c", e.target.value)}
               value={formData.description}
               onChange={(e) => handleChange("description", e.target.value)}
               placeholder="Enter task description (optional)"
@@ -137,12 +140,13 @@ priority: "Medium",
                 Category
               </label>
               <Select
-                value={formData.category}
+value={formData.category_c}
+                onChange={(e) => handleChange("category_c", e.target.value)}
                 onChange={(e) => handleChange("category", e.target.value)}
               >
-                {categories.map(category => (
-                  <option key={category.Id} value={category.name}>
-                    {category.name}
+{categories.filter(cat => cat.Id !== "all").map(category => (
+                  <option key={category.Id} value={category.Name || category.name}>
+                    {category.Name || category.name}
                   </option>
                 ))}
               </Select>
@@ -152,7 +156,9 @@ priority: "Medium",
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Priority
               </label>
-              <Select
+<Select
+                value={formData.priority_c}
+                onChange={(e) => handleChange("priority_c", e.target.value)}
                 value={formData.priority}
                 onChange={(e) => handleChange("priority", e.target.value)}
               >
@@ -166,7 +172,9 @@ priority: "Medium",
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Status
               </label>
-              <Select 
+<Select 
+                value={formData.status_c}
+                onChange={(e) => handleChange("status_c", e.target.value)}
                 value={formData.status}
                 onChange={(e) => handleChange('status', e.target.value)}
               >
@@ -182,7 +190,9 @@ priority: "Medium",
               Due Date
             </label>
             <Input
-              type="datetime-local"
+type="datetime-local"
+              value={formData.due_date_c}
+              onChange={(e) => handleChange("due_date_c", e.target.value)}
               value={formData.dueDate}
               onChange={(e) => handleChange("dueDate", e.target.value)}
             />
