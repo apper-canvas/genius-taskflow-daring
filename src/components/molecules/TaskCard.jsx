@@ -8,7 +8,6 @@ import Checkbox from "@/components/atoms/Checkbox";
 import Badge from "@/components/atoms/Badge";
 
 const TaskCard = forwardRef(({ task, onToggleComplete, onEdit, onDelete, className = "" }, ref) => {
-  const isOverdue = task.due_date_c || task.dueDate ? isAfter(new Date(), new Date(task.due_date_c || task.dueDate)) : false;
 
   // Enhanced urgency calculation logic
   const isTaskUrgent = (task) => {
