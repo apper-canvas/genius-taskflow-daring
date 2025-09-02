@@ -197,19 +197,44 @@ const handleSaveTask = async (taskData) => {
         completedTasks={taskStats.completed}
       />
 
-      <div className="flex-1 p-6">
+<div className="flex-1 p-6">
         {categoryName && (
           <motion.div
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             className="mb-6"
           >
-            <h2 className="text-xl font-bold text-gray-900 capitalize">
-              {categoryName} Tasks
-            </h2>
-            <p className="text-gray-600 text-sm mt-1">
-              {filteredTasks.length} task{filteredTasks.length !== 1 ? "s" : ""} found
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 capitalize">
+                  {categoryName} Tasks
+                </h2>
+                <p className="text-gray-600 text-sm mt-1">
+                  {filteredTasks.length} task{filteredTasks.length !== 1 ? "s" : ""} found
+                  {(() => {
+                    const urgentCount = filteredTasks.filter(task => {
+                      const priority = task.priority_c || task.priority || "Medium"
+                      const dueDate = task.due_date_c || task.dueDate
+                      return priority === "High" || (dueDate && new Date(dueDate) <= new Date())
+                    }).length
+                    return urgentCount > 0 ? ` • ${urgentCount} urgent` : ""
+                  })()}
+                </p>
+              </div>
+              {(() => {
+                const urgentCount = filteredTasks.filter(task => {
+                  const priority = task.priority_c || task.priority || "Medium"
+                  const dueDate = task.due_date_c || task.dueDate
+                  return priority === "High" || (dueDate && new Date(dueDate) <= new Date())
+                }).length
+                return urgentCount > 0 ? (
+                  <div className="flex items-center space-x-2 text-red-600">
+                    <span className="animate-pulse">🚨</span>
+                    <span className="text-sm font-medium">{urgentCount} Urgent Task{urgentCount !== 1 ? "s" : ""}</span>
+                  </div>
+                ) : null
+              })()}
+            </div>
           </motion.div>
         )}
 

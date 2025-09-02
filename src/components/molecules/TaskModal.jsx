@@ -159,30 +159,27 @@ value={formData.category_c}
 <Select
                 value={formData.priority_c}
                 onChange={(e) => handleChange("priority_c", e.target.value)}
-                value={formData.priority}
-                onChange={(e) => handleChange("priority", e.target.value)}
               >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-              </Select>
-</div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-<Select 
-                value={formData.status_c}
-                onChange={(e) => handleChange("status_c", e.target.value)}
-                value={formData.status}
-                onChange={(e) => handleChange('status', e.target.value)}
-              >
-                <option value="pending">Pending</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
+                <option value="Low">🔵 Low Priority</option>
+                <option value="Medium">🟡 Medium Priority</option>
+                <option value="High">🔴 High Priority - Urgent</option>
               </Select>
             </div>
+</div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Status
+            </label>
+            <Select 
+              value={formData.status_c}
+              onChange={(e) => handleChange("status_c", e.target.value)}
+            >
+              <option value="pending">⏳ Pending</option>
+              <option value="in-progress">🔄 In Progress</option>
+              <option value="on-hold">⏸️ On Hold</option>
+              <option value="completed">✅ Completed</option>
+            </Select>
           </div>
 
           <div>

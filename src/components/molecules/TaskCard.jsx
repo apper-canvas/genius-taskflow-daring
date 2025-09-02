@@ -1,19 +1,58 @@
 import React, { forwardRef } from "react";
 import { motion } from "framer-motion";
-import { format, isAfter, isToday, isTomorrow } from "date-fns";
+import { differenceInDays, format, isAfter, isToday, isTomorrow } from "date-fns";
 import { toast } from "react-toastify";
 import { cn } from "@/utils/cn";
 import ApperIcon from "@/components/ApperIcon";
 import Checkbox from "@/components/atoms/Checkbox";
 import Badge from "@/components/atoms/Badge";
 
-const TaskCard = forwardRef(({ 
-  task, 
-  onToggleComplete, 
-  onEdit, 
-  onDelete,
-  className = "" 
-}, ref) => {
+const TaskCard = forwardRef(({ task, onToggleComplete, onEdit, onDelete, className = "" }, ref) => {
+  const isOverdue = task.due_date_c || task.dueDate ? isAfter(new Date(), new Date(task.due_date_c || task.dueDate)) : false;
+
+  // Enhanced urgency calculation logic
+  const isTaskUrgent = (task) => {
+    const priority = task.priority_c || task.priority || "Medium"
+    const dueDate = task.due_date_c || task.dueDate
+    
+    if (priority === "High") {
+      if (dueDate) {
+        const daysDiff = differenceInDays(new Date(dueDate), new Date())
+        return daysDiff <= 2 // High priority tasks due within 2 days are urgent
+      }
+      return true // All high priority tasks are urgent
+    }
+    
+    if (dueDate) {
+      const daysDiff = differenceInDays(new Date(dueDate), new Date())
+      return daysDiff <= 0 // Any overdue task is urgent
+    }
+    
+    return false
+  }
+
+  const getUrgencyVariant = (task) => {
+    const priority = task.priority_c || task.priority || "Medium"
+    const dueDate = task.due_date_c || task.dueDate
+    
+    if (isOverdue) return "overdue"
+    if (isTaskUrgent(task)) return "critical"
+    if (priority === "High") return "high-priority"
+    if (dueDate && differenceInDays(new Date(dueDate), new Date()) <= 3) return "due-soon"
+    
+    return getPriorityColor(priority)
+  }
+
+  const getUrgencyIcon = (task) => {
+    const priority = task.priority_c || task.priority || "Medium"
+    
+    if (isOverdue) return "AlertCircle"
+    if (isTaskUrgent(task)) return "AlertTriangle"
+    if (priority === "High") return "ChevronUp"
+    if (priority === "Low") return "ChevronDown"
+    
+    return null
+  }
   const handleToggleComplete = async () => {
     try {
       await onToggleComplete(task.Id)
@@ -134,12 +173,25 @@ checked={task.completed_c || task.completed || false}
               {task.title_c || task.title || task.Name}
             </h3>
 <div className="flex items-center space-x-2 ml-4">
-<Badge variant={getStatusColor((task.completed_c || task.completed) ? "completed" : (task.status_c || task.status))}>
+              <Badge variant={getStatusColor((task.completed_c || task.completed) ? "completed" : (task.status_c || task.status))}>
                 {getStatusLabel((task.completed_c || task.completed) ? "completed" : (task.status_c || task.status))}
               </Badge>
-              <Badge variant={getPriorityColor(task.priority)}>
-                {task.priority}
+              <Badge variant={getUrgencyVariant(task)}>
+                <div className="flex items-center space-x-1">
+                  {getUrgencyIcon(task) && (
+                    <ApperIcon name={getUrgencyIcon(task)} size={12} />
+                  )}
+                  <span>{task.priority_c || task.priority || "Medium"}</span>
+                </div>
               </Badge>
+              {isTaskUrgent(task) && (
+                <Badge variant="critical">
+                  <div className="flex items-center space-x-1">
+                    <ApperIcon name="AlertTriangle" size={12} />
+                    <span>URGENT</span>
+                  </div>
+                </Badge>
+              )}
             </div>
           </div>
           
