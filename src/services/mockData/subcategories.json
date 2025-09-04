@@ -1,0 +1,86 @@
+[
+  {
+    "Id": 1,
+    "name": "Client Projects",
+    "parent_category_id": 1,
+    "color": "#4C1D95",
+    "icon": "Users"
+  },
+  {
+    "Id": 2,
+    "name": "Team Management",
+    "parent_category_id": 1,
+    "color": "#5B21B6",
+    "icon": "UserCheck"
+  },
+  {
+    "Id": 3,
+    "name": "Financial Tasks",
+    "parent_category_id": 1,
+    "color": "#6D28D9",
+    "icon": "DollarSign"
+  },
+  {
+    "Id": 4,
+    "name": "Strategic Planning",
+    "parent_category_id": 1,
+    "color": "#7C3AED",
+    "icon": "Target"
+  },
+  {
+    "Id": 5,
+    "name": "Health & Fitness",
+    "parent_category_id": 2,
+    "color": "#059669",
+    "icon": "Heart"
+  },
+  {
+    "Id": 6,
+    "name": "Family & Friends",
+    "parent_category_id": 2,
+    "color": "#10B981",
+    "icon": "Home"
+  },
+  {
+    "Id": 7,
+    "name": "Hobbies",
+    "parent_category_id": 2,
+    "color": "#34D399",
+    "icon": "Gamepad2"
+  },
+  {
+    "Id": 8,
+    "name": "Self Development",
+    "parent_category_id": 2,
+    "color": "#6EE7B7",
+    "icon": "BookOpen"
+  },
+  {
+    "Id": 9,
+    "name": "Critical Deadlines",
+    "parent_category_id": 3,
+    "color": "#DC2626",
+    "icon": "Clock"
+  },
+  {
+    "Id": 10,
+    "name": "Emergency Tasks",
+    "parent_category_id": 3,
+    "color": "#EF4444",
+    "icon": "AlertCircle"
+  },
+  {
+    "Id": 11,
+    "name": "High Priority",
+    "parent_category_id": 3,
+    "color": "#F87171",
+    "icon": "Zap"
+  },
+  {
+    "Id": 12,
+    "name": "Time Sensitive",
+    "parent_category_id": 3,
+    "color": "#FCA5A5",
+    "icon": "Timer"
+  }
+]

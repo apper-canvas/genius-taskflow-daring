@@ -43,11 +43,15 @@ const TaskBoard = () => {
 const filteredTasks = useMemo(() => {
     let filtered = [...tasks]
 
-    // Filter by category from URL
+    // Filter by category or subcategory from URL
     if (categoryName) {
       filtered = filtered.filter(task => {
         const taskCategory = task.category_c || task.category || ""
-        return taskCategory.toLowerCase() === categoryName.toLowerCase()
+        const taskSubcategory = task.subcategory_c || task.subcategory || ""
+        
+        // Check if it matches category or subcategory
+        return taskCategory.toLowerCase() === categoryName.toLowerCase() ||
+               taskSubcategory.toLowerCase() === categoryName.toLowerCase()
       })
     }
 
@@ -207,7 +211,7 @@ const handleSaveTask = async (taskData) => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-gray-900 capitalize">
-                  {categoryName} Tasks
+{categoryName} Tasks
                 </h2>
                 <p className="text-gray-600 text-sm mt-1">
                   {filteredTasks.length} task{filteredTasks.length !== 1 ? "s" : ""} found
@@ -244,7 +248,7 @@ const handleSaveTask = async (taskData) => {
           onEditTask={handleEditTask}
           onDeleteTask={handleDeleteTask}
           onAddTask={handleAddTask}
-          emptyTitle={searchQuery ? "No matching tasks found" : categoryName ? `No ${categoryName.toLowerCase()} tasks` : "No tasks yet"}
+emptyTitle={searchQuery ? "No matching tasks found" : categoryName ? `No ${categoryName.toLowerCase()} tasks` : "No tasks yet"}
           emptyDescription={searchQuery ? "Try adjusting your search terms" : "Create your first task to get started"}
         />
       </div>

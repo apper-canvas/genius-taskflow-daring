@@ -6,7 +6,7 @@ import Button from "@/components/atoms/Button"
 import Input from "@/components/atoms/Input"
 import Textarea from "@/components/atoms/Textarea"
 import Select from "@/components/atoms/Select"
-
+import { categoryService } from "@/services/api/categoryService"
 const TaskModal = ({ 
   isOpen, 
   onClose, 
@@ -18,46 +18,88 @@ const [formData, setFormData] = useState({
     title_c: "",
     description_c: "",
     category_c: "Work",
+    subcategory_c: "",
     priority_c: "Medium",
     status_c: "pending",
     due_date_c: ""
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [subcategories, setSubcategories] = useState([])
+  const [loadingSubcategories, setLoadingSubcategories] = useState(false)
 
-  useEffect(() => {
-if (task) {
+useEffect(() => {
+    if (task) {
       const dueDate = task.due_date_c || task.dueDate
       setFormData({
         title_c: task.title_c || task.title || task.Name || "",
         description_c: task.description_c || task.description || "",
         category_c: task.category_c || task.category || "Work",
+        subcategory_c: task.subcategory_c || task.subcategory || "",
         priority_c: task.priority_c || task.priority || "Medium",
         status_c: task.status_c || task.status || "pending",
         due_date_c: dueDate ? new Date(dueDate).toISOString().slice(0, 16) : ""
       })
     } else {
       setFormData({
-        title: "",
-        description: "",
-        category: "Work",
-priority: "Medium",
-        status: "pending",
-        dueDate: ""
+        title_c: "",
+        description_c: "",
+        category_c: "Work",
+        subcategory_c: "",
+        priority_c: "Medium",
+        status_c: "pending",
+        due_date_c: ""
       })
     }
   }, [task, isOpen])
 
-  const handleSubmit = async (e) => {
+  // Load subcategories when category changes
+  useEffect(() => {
+    const loadSubcategories = async () => {
+      if (!formData.category_c) {
+        setSubcategories([])
+        return
+      }
+
+      const selectedCategory = categories.find(cat => 
+        (cat.Name || cat.name) === formData.category_c
+      )
+      
+      if (!selectedCategory || selectedCategory.Id === "all") {
+        setSubcategories([])
+        return
+      }
+
+      setLoadingSubcategories(true)
+      try {
+        const subs = await categoryService.getSubcategories(selectedCategory.Id)
+        setSubcategories(subs)
+        
+        // Reset subcategory if current selection is not valid for new category
+        if (formData.subcategory_c && !subs.find(sub => sub.name === formData.subcategory_c)) {
+          setFormData(prev => ({ ...prev, subcategory_c: "" }))
+        }
+      } catch (error) {
+        console.error("Failed to load subcategories:", error)
+        setSubcategories([])
+      } finally {
+        setLoadingSubcategories(false)
+      }
+    }
+
+    loadSubcategories()
+  }, [formData.category_c, categories])
+
+const handleSubmit = async (e) => {
     e.preventDefault()
     
-    if (!formData.title.trim()) {
+    if (!formData.title_c.trim()) {
       toast.error("Please enter a task title")
       return
     }
 
     setIsLoading(true)
     try {
-const taskData = {
+      const taskData = {
         ...formData,
         due_date_c: formData.due_date_c ? new Date(formData.due_date_c).toISOString() : null
       }
@@ -111,10 +153,10 @@ const taskData = {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Title *
             </label>
-            <Input
+<Input
               type="text"
-value={formData.title_c}
-              onChange={(e) => handleChange("title", e.target.value)}
+              value={formData.title_c}
+              onChange={(e) => handleChange("title_c", e.target.value)}
               placeholder="Enter task title"
               required
             />
@@ -127,8 +169,6 @@ value={formData.title_c}
 <Textarea
               value={formData.description_c}
               onChange={(e) => handleChange("description_c", e.target.value)}
-              value={formData.description}
-              onChange={(e) => handleChange("description", e.target.value)}
               placeholder="Enter task description (optional)"
               rows={3}
             />
@@ -139,12 +179,11 @@ value={formData.title_c}
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category
               </label>
-              <Select
-value={formData.category_c}
+<Select
+                value={formData.category_c}
                 onChange={(e) => handleChange("category_c", e.target.value)}
-                onChange={(e) => handleChange("category", e.target.value)}
               >
-{categories.filter(cat => cat.Id !== "all").map(category => (
+                {categories.filter(cat => cat.Id !== "all").map(category => (
                   <option key={category.Id} value={category.Name || category.name}>
                     {category.Name || category.name}
                   </option>
@@ -154,9 +193,35 @@ value={formData.category_c}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                Subcategory
+              </label>
+              <Select
+                value={formData.subcategory_c}
+                onChange={(e) => handleChange("subcategory_c", e.target.value)}
+                disabled={loadingSubcategories || subcategories.length === 0}
+              >
+                <option value="">
+                  {loadingSubcategories 
+                    ? "Loading subcategories..." 
+                    : subcategories.length === 0 
+                      ? "No subcategories available" 
+                      : "Select subcategory (optional)"}
+                </option>
+                {subcategories.map(subcategory => (
+                  <option key={subcategory.Id} value={subcategory.name}>
+                    {subcategory.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Priority
               </label>
-<Select
+              <Select
                 value={formData.priority_c}
                 onChange={(e) => handleChange("priority_c", e.target.value)}
               >
@@ -165,33 +230,31 @@ value={formData.category_c}
                 <option value="High">🔴 High Priority - Urgent</option>
               </Select>
             </div>
-</div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Status
-            </label>
-            <Select 
-              value={formData.status_c}
-              onChange={(e) => handleChange("status_c", e.target.value)}
-            >
-              <option value="pending">⏳ Pending</option>
-              <option value="in-progress">🔄 In Progress</option>
-              <option value="on-hold">⏸️ On Hold</option>
-              <option value="completed">✅ Completed</option>
-            </Select>
-          </div>
 
-          <div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
+              <Select 
+                value={formData.status_c}
+                onChange={(e) => handleChange("status_c", e.target.value)}
+              >
+                <option value="pending">⏳ Pending</option>
+                <option value="in-progress">🔄 In Progress</option>
+                <option value="on-hold">⏸️ On Hold</option>
+                <option value="completed">✅ Completed</option>
+              </Select>
+            </div>
+          </div>
+          
+<div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Due Date
             </label>
             <Input
-type="datetime-local"
+              type="datetime-local"
               value={formData.due_date_c}
               onChange={(e) => handleChange("due_date_c", e.target.value)}
-              value={formData.dueDate}
-              onChange={(e) => handleChange("dueDate", e.target.value)}
             />
           </div>
 

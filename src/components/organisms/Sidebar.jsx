@@ -82,14 +82,14 @@ const Sidebar = ({
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">
+<h3 className="text-sm font-semibold text-gray-900 mb-4">
             Filter by Category
           </h3>
           <CategoryFilter
             categories={categories}
             selectedCategory={selectedCategory}
             onCategoryChange={onCategoryChange}
-            className="flex-col items-start space-y-2"
+            className="space-y-2"
           />
         </div>
       </div>
@@ -168,14 +168,14 @@ const Sidebar = ({
             <h3 className="text-sm font-semibold text-gray-900 mb-4">
               Filter by Category
             </h3>
-            <CategoryFilter
+<CategoryFilter
               categories={categories}
               selectedCategory={selectedCategory}
               onCategoryChange={(category) => {
                 onCategoryChange(category)
                 onToggle()
               }}
-              className="flex-col items-start space-y-2"
+              className="space-y-2"
             />
           </div>
         </div>
