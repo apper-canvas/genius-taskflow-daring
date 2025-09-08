@@ -13,12 +13,13 @@ export const taskService = {
 
       const params = {
         fields: [
-          {"field": {"Name": "Id"}},
+{"field": {"Name": "Id"}},
           {"field": {"Name": "Name"}},
           {"field": {"Name": "title_c"}},
           {"field": {"Name": "description_c"}},
           {"field": {"Name": "completed_c"}},
           {"field": {"Name": "category_c"}},
+          {"field": {"Name": "subcategory_c"}},
           {"field": {"Name": "priority_c"}},
           {"field": {"Name": "due_date_c"}},
           {"field": {"Name": "created_at_c"}},
@@ -57,12 +58,13 @@ export const taskService = {
 
       const params = {
         fields: [
-          {"field": {"Name": "Id"}},
+{"field": {"Name": "Id"}},
           {"field": {"Name": "Name"}},
           {"field": {"Name": "title_c"}},
           {"field": {"Name": "description_c"}},
           {"field": {"Name": "completed_c"}},
           {"field": {"Name": "category_c"}},
+          {"field": {"Name": "subcategory_c"}},
           {"field": {"Name": "priority_c"}},
           {"field": {"Name": "due_date_c"}},
           {"field": {"Name": "created_at_c"}},
@@ -98,12 +100,13 @@ export const taskService = {
       })
 
       const params = {
-        records: [{
+records: [{
           Name: taskData.title_c || taskData.title || "",
           title_c: taskData.title_c || taskData.title || "",
           description_c: taskData.description_c || taskData.description || "",
           completed_c: taskData.completed_c || taskData.completed || false,
           category_c: taskData.category_c || taskData.category || "Work",
+          subcategory_c: taskData.subcategory_c || taskData.subcategory || "",
           priority_c: taskData.priority_c || taskData.priority || "Medium",
           due_date_c: taskData.due_date_c || taskData.dueDate || null,
           created_at_c: taskData.created_at_c || new Date().toISOString(),
@@ -168,9 +171,12 @@ export const taskService = {
       }
       if (taskData.completed_c !== undefined || taskData.completed !== undefined) {
         updateRecord.completed_c = taskData.completed_c || taskData.completed
-      }
+}
       if (taskData.category_c !== undefined || taskData.category !== undefined) {
         updateRecord.category_c = taskData.category_c || taskData.category
+      }
+      if (taskData.subcategory_c !== undefined || taskData.subcategory !== undefined) {
+        updateRecord.subcategory_c = taskData.subcategory_c || taskData.subcategory
       }
       if (taskData.priority_c !== undefined || taskData.priority !== undefined) {
         updateRecord.priority_c = taskData.priority_c || taskData.priority
@@ -184,7 +190,6 @@ export const taskService = {
       if (taskData.status_c !== undefined || taskData.status !== undefined) {
         updateRecord.status_c = taskData.status_c || taskData.status
       }
-
       const params = {
         records: [updateRecord]
       }

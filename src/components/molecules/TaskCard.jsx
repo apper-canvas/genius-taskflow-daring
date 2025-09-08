@@ -206,7 +206,9 @@ checked={task.completed_c || task.completed || false}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
 <Badge variant={getCategoryVariant()}>
-                {task.category_c || task.category}
+                {task.subcategory_c || task.subcategory 
+                  ? `${task.category_c || task.category} > ${task.subcategory_c || task.subcategory}`
+                  : task.category_c || task.category}
               </Badge>
               
 {(task.due_date_c || task.dueDate) && (
