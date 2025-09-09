@@ -7,6 +7,7 @@ import Input from "@/components/atoms/Input"
 import Textarea from "@/components/atoms/Textarea"
 import Select from "@/components/atoms/Select"
 import { categoryService } from "@/services/api/categoryService"
+import { aiService } from "@/services/api/aiService"
 const TaskModal = ({ 
   isOpen, 
   onClose, 
@@ -23,9 +24,10 @@ const [formData, setFormData] = useState({
     status_c: "pending",
     due_date_c: ""
   })
-  const [isLoading, setIsLoading] = useState(false)
+const [isLoading, setIsLoading] = useState(false)
   const [subcategories, setSubcategories] = useState([])
   const [loadingSubcategories, setLoadingSubcategories] = useState(false)
+  const [generatingDescription, setGeneratingDescription] = useState(false)
 
 useEffect(() => {
     if (task) {
@@ -88,7 +90,6 @@ useEffect(() => {
 
     loadSubcategories()
   }, [formData.category_c, categories])
-
 const handleSubmit = async (e) => {
     e.preventDefault()
     
@@ -116,6 +117,25 @@ const handleSubmit = async (e) => {
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleGenerateDescription = async () => {
+    if (!formData.title_c.trim()) {
+      toast.error("Please enter a task title first")
+      return
+    }
+
+    setGeneratingDescription(true)
+    try {
+      const generatedDescription = await aiService.generateTaskDescription(formData.title_c)
+      handleChange("description_c", generatedDescription)
+      toast.success("Description generated successfully!")
+    } catch (error) {
+      // Error handling is done in the service
+      console.error("Failed to generate description:", error)
+    } finally {
+      setGeneratingDescription(false)
+    }
   }
 
   if (!isOpen) return null
@@ -162,14 +182,36 @@ const handleSubmit = async (e) => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
-            </label>
-<Textarea
+<div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateDescription}
+                disabled={!formData.title_c.trim() || generatingDescription}
+                className="text-xs px-3 py-1 h-7"
+              >
+                {generatingDescription ? (
+                  <>
+                    <ApperIcon name="Loader2" size={12} className="animate-spin mr-1" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <ApperIcon name="Sparkles" size={12} className="mr-1" />
+                    Generate with AI
+                  </>
+                )}
+              </Button>
+            </div>
+            <Textarea
               value={formData.description_c}
               onChange={(e) => handleChange("description_c", e.target.value)}
-              placeholder="Enter task description (optional)"
+              placeholder="Enter task description (optional) or use AI to generate"
               rows={3}
             />
           </div>
